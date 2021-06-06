@@ -1,0 +1,23 @@
+---
+# Enable (true) or disable (false) service firewalld/ufw:
+firewall_enable: true
+
+# For RedHat
+firewall_firewalld_service_rules:
+  # - service: http
+  # - service: https
+firewall_firewalld_port_rules:
+  # - port: 1554/udp
+  # - port: 1719-1721/tcp
+# Add (true) or delete (false) rules for firewalld (RedHat):
+firewall_firewalld_service_rules_state: true
+firewall_firewalld_port_rules_state: true
+
+# For Ubuntu
+firewall_ufw_port_rules:
+  # - port: 1554
+  #   proto: udp
+  # - port: 9666:9667
+  #   proto: tcp
+# Add (true) or delete (false) rules for ufw (Ubuntu):
+firewall_ufw_port_rules_state: true

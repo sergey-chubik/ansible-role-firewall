@@ -1,0 +1,46 @@
+---
+# tasks file for firewall
+- block:
+    - name: firewall | {% if firewall_enable %}Enable{% else %}Disable{% endif %} the firewalld service
+      service:
+        name: firewalld
+        state: "{% if firewall_enable %}started{% else %}stopped{% endif %}"
+        enabled: "{% if firewall_enable %}yes{% else %}no{% endif %}"
+
+    - name: firewall | Set service rules firewalld
+      firewalld:
+        service: "{{ item.service }}"
+        state: "{% if firewall_firewalld_service_rules_state %}enabled{% else %}disabled{% endif %}"
+        permanent: yes
+        immediate: yes
+      with_items:
+        - "{{ firewall_firewalld_service_rules }}"
+      when: firewall_firewalld_service_rules and firewall_enable
+
+    - name: firewall | Set port rules firewalld
+      firewalld:
+        port: "{{ item.port }}"
+        state: "{% if firewall_firewalld_port_rules_state %}enabled{% else %}disabled{% endif %}"
+        permanent: yes
+        immediate: yes
+      with_items:
+        - "{{ firewall_firewalld_port_rules }}"
+      when: firewall_firewalld_port_rules and firewall_enable
+  when: ansible_os_family == "RedHat"
+
+- block:
+    - name: firewall | {% if firewall_enable %}Enable{% else %}Disable{% endif %} the ufw firewall
+      service:
+        name: ufw
+        state: "{% if firewall_enable %}started{% else %}stopped{% endif %}"
+        enabled: "{% if firewall_enable %}yes{% else %}no{% endif %}"
+
+    - name: firewall | Set port rules ufw
+      ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+        delete: "{% if firewall_ufw_port_rules_state %}no{% else %}yes{% endif %}"
+      with_items: "{{ firewall_ufw_port_rules }}"
+      when: firewall_ufw_port_rules and firewall_enable
+  when: ansible_os_family == "Debian"
